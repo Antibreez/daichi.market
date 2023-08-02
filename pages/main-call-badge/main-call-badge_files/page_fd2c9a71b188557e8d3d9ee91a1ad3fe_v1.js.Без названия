@@ -1,0 +1,140 @@
+
+; /* Start:"a:4:{s:4:"full";s:54:"/local/templates/main/assets/js/quiz.js?16896595423790";s:6:"source";s:39:"/local/templates/main/assets/js/quiz.js";s:3:"min";s:0:"";s:3:"map";s:0:"";}"*/
+$(document).ready(function () {
+    // счётчик форм квиза - комнаты
+    let tabsCounter = 1;
+
+    // переключение вкладок-табов в селект - секции
+    $(document).on("click", ".tab-button", (e) => {
+        const tab = $(e.currentTarget);
+        tab.closest(".tab-selectors-box").find(".active").removeClass("active");
+        tab.addClass("active");
+        $(".tab-select-form").removeClass("active");
+        tab.closest(".quiz-section").find(('[data-room-id="' + tab.data().roomId + '"]')).addClass("active");
+    })
+
+
+    const tabsNumer = () => {
+        let index = 1;
+        $(".tab-button:not(.hidden)").each(function () {
+            $(this).find(".tb-text-js").text("Комната " + index++)
+        })
+
+    }
+    tabsNumer()
+
+    // удаление кнопок и форм
+    $(document).on("click", ".tab_delete", (e) => {
+        e.stopPropagation();
+        tabsCounter = tabsCounter - 1;
+        const delButton = $(e.currentTarget);
+
+        const currentTab = delButton.closest(".tab-button");
+        const currentForm = currentTab.closest(".quiz-section").find(".quiz-rooms").find(('[data-room-id="' + currentTab.data().roomId + '"]'));
+        currentTab.removeClass("active").addClass("hidden");
+        currentForm.removeClass("active").addClass("hidden");
+        currentForm.find("input").val("");
+
+        currentTab.siblings(".tab-button:not(.hidden):last").addClass("active");
+        currentForm.siblings(".tab-select-form:not(.hidden):last").addClass("active");
+
+        if (tabsCounter === 3) {
+            $(".append-new-form-button").show();
+        }
+
+        if (tabsCounter === 1) {
+            $(".tab_delete").hide();
+        }
+
+
+        tabsNumer()
+
+
+    })
+
+
+    // функция добавления новой формы
+    const newFormAppender = () => {
+        tabsCounter++;
+
+        const tabButton = $(".tab-button");
+        const tabForm = $(".tab-select-form");
+
+        tabButton.removeClass("active");
+        tabForm.removeClass("active");
+
+
+        const nextShower = (target) => {
+            const parent = target.closest(".wrp-container-js");
+            parent.find(".hidden").first().removeClass("hidden").addClass("active");
+        }
+
+        nextShower(tabButton)
+        nextShower(tabForm)
+
+    }
+
+
+    $(document).on("click", ".append-new-form-button", (e) => {
+        if (tabsCounter >= 3) {
+            // скрываем кнопку добавить
+            $(".append-new-form-button").hide();
+
+        }
+        newFormAppender();
+
+
+        if (tabsCounter > 1) {
+            $(".tab_delete").show();
+        }
+
+        tabsNumer()
+
+    });
+
+
+    // переключение МЕЖДУ ЭТАПАМИ КВИЗА 
+
+    $(document).on('click', '.select-block-next', function () {
+        const form = $(this).closest('.quiz-section')
+
+        if (form.next('.quiz-section').length) {
+            form.hide()
+            form.next('.quiz-section').show()
+        }
+        if(form.next().next().next().length){
+            form.next('.quiz-section').find(".select-controls").addClass("quiz-section-1");
+        }else{
+            form.next('.quiz-section').find(".select-controls").addClass("quiz-section-2");
+        }
+    })
+
+    $(document).on('click', '.quiz-prev-button', function () {
+        const form = $(this).closest('.quiz-section')
+
+        if (form.prev('.quiz-section').length) {
+            form.hide()
+            form.prev('.quiz-section').show()
+        }
+    })
+
+    let quiz_form = document.getElementsByName('web_form_submit');
+    $(quiz_form).on('click', function () {
+        let wrap = document.getElementsByClassName('modal-backdrop');
+        $(wrap).remove();
+        $('body').removeClass("modal-open");
+    });
+
+});
+/* End */
+;
+; /* Start:"a:4:{s:4:"full";s:98:"/local/templates/main/components/usstudio/form.result.new/notify.admission/script.js?1689659543224";s:6:"source";s:84:"/local/templates/main/components/usstudio/form.result.new/notify.admission/script.js";s:3:"min";s:0:"";s:3:"map";s:0:"";}"*/
+$(function () {
+    $(document).on('click', '.js-add-id-to-modal', function () {
+        $('input[name="form_hidden_39"]').val($(this).data().name)
+        $('input[name="form_hidden_43"]').val($(this).data().name)
+    })
+})
+/* End */
+;; /* /local/templates/main/assets/js/quiz.js?16896595423790*/
+; /* /local/templates/main/components/usstudio/form.result.new/notify.admission/script.js?1689659543224*/

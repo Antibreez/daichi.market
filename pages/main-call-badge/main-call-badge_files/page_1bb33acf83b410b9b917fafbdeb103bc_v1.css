@@ -1,0 +1,100 @@
+
+
+/* Start:/local/templates/main/components/bitrix/form.result.new/quiz/style.css?1689659542623*/
+table.form-table
+{
+	width:100%;
+	background-color:white;
+	border-collapse:collapse;
+	font-size:100%;
+	font-weight:normal;
+	line-height:160%;
+}
+
+table.form-table th, table.form-table td
+{
+	border:1px solid #ADC3D5;
+	padding: 5px 5px;
+	vertical-align:top;
+}
+
+table.form-table th
+{
+	background-image:url(/local/templates/main/components/bitrix/form.result.new/quiz/images/table_head.gif);
+	background-repeat:repeat-x;
+	text-align: left;
+	color:#25639A;
+}
+
+
+table.form-table td
+{
+	padding: 15px 5px;
+}
+
+.form-required 
+{
+	color: red;
+}
+
+.error-fld {
+	display: block;
+	float: left;
+	height: 13px;
+	width: 15px;
+	background-repeat: no-repeat;
+	background-image: url(/local/templates/main/components/bitrix/form.result.new/quiz/images/icon_warn.gif);
+}
+/* End */
+
+
+/* Start:/local/templates/main/assets/css/news-block/style.css?1689659541754*/
+.news-item {
+	min-height: 405px;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	width: 100%;
+	position: relative
+}
+
+.new-img {
+	border-radius: 8px;
+	height: 222px;
+	-ms-flex-negative: 0;
+	flex-shrink: 0;
+	overflow: hidden
+}
+
+.new-img .img-cover {
+	-o-object-position: 0 75%;
+	object-position: 0 75%
+}
+
+.new-text-box {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	width: 100%;
+	padding: 25px 0 0
+}
+
+.new-title {
+	margin-bottom: 10px
+}
+
+.new-date {
+	color: #6c7684;
+	margin-bottom: 14px
+}
+/* End */
+/* /local/templates/main/components/bitrix/form.result.new/quiz/style.css?1689659542623 */
+/* /local/templates/main/assets/css/news-block/style.css?1689659541754 */

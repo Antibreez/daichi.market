@@ -1,0 +1,1283 @@
+// библиотечка для горизонтального *(обоих) скролла, срабатывает на .dragscroll
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['exports'], factory);
+    } else if (typeof exports !== 'undefined') {
+        factory(exports);
+    } else {
+        factory((root.dragscroll = {}));
+    }
+}(this, function (exports) {
+    var _window = window;
+    var _document = document;
+    var mousemove = 'mousemove';
+    var mouseup = 'mouseup';
+    var mousedown = 'mousedown';
+    var EventListener = 'EventListener';
+    var addEventListener = 'add' + EventListener;
+    var removeEventListener = 'remove' + EventListener;
+    var newScrollX, newScrollY;
+
+    var dragged = [];
+    var reset = function (i, el) {
+        for (i = 0; i < dragged.length;) {
+            el = dragged[i++];
+            el = el.container || el;
+            el[removeEventListener](mousedown, el.md, 0);
+            _window[removeEventListener](mouseup, el.mu, 0);
+            _window[removeEventListener](mousemove, el.mm, 0);
+        }
+
+        // cloning into array since HTMLCollection is updated dynamically
+        dragged = [].slice.call(_document.getElementsByClassName('dragscroll'));
+        for (i = 0; i < dragged.length;) {
+            (function (el, lastClientX, lastClientY, pushed, scroller, cont) {
+                (cont = el.container || el)[addEventListener](
+                    mousedown,
+                    cont.md = function (e) {
+                        if (!el.hasAttribute('nochilddrag') ||
+                            _document.elementFromPoint(
+                                e.pageX, e.pageY
+                            ) == cont
+                        ) {
+                            pushed = 1;
+                            lastClientX = e.clientX;
+                            lastClientY = e.clientY;
+
+                            e.preventDefault();
+                        }
+                    }, 0
+                );
+
+                _window[addEventListener](
+                    mouseup, cont.mu = function () {
+                        pushed = 0;
+                    }, 0
+                );
+
+                _window[addEventListener](
+                    mousemove,
+                    cont.mm = function (e) {
+                        if (pushed) {
+                            (scroller = el.scroller || el).scrollLeft -=
+                                newScrollX = (-lastClientX + (lastClientX = e.clientX));
+                            scroller.scrollTop -=
+                                newScrollY = (-lastClientY + (lastClientY = e.clientY));
+                            if (el == _document.body) {
+                                (scroller = _document.documentElement).scrollLeft -= newScrollX;
+                                scroller.scrollTop -= newScrollY;
+                            }
+                        }
+                    }, 0
+                );
+            })(dragged[i++]);
+        }
+    }
+
+
+    if (_document.readyState == 'complete') {
+        reset();
+    } else {
+        _window[addEventListener]('load', reset, 0);
+    }
+
+    exports.reset = reset;
+}));
+
+
+// отсюда финансовый блок с кнопками и сводной инфой из корзины и оформления получает правильные отступы
+const invoiceControllerTopFixer = (height) => {
+    $(".invoice-controller").css("top", height + 20 + "px")
+}
+
+
+// поведение header при скролле вниз
+if (window.innerWidth > 767) {
+
+    let posTop =
+        window.pageYOffset !== undefined ?
+        window.pageYOffset :
+        (document.documentElement || document.body.parentNode || document.body)
+        .scrollTop;
+
+    $(window).on("scroll", function () {
+        const newPostop = $(this).scrollTop();
+        const slideObj = $(".header-scroll-slide");
+
+
+        if (
+            newPostop > 100 &&
+            posTop < newPostop
+        ) {
+            slideObj.slideUp(250);
+            return;
+        } else if (posTop > newPostop && !(slideObj.filter(":animated").length > 0)) {
+            slideObj.slideDown(250);
+            return;
+        }
+        setTimeout(() => (posTop = newPostop), 200);
+    });
+
+
+}
+
+
+// переключение категорий каталога при наведении мыши
+
+$(".header-catalogue-item-js").one("mouseenter", () => {
+    if (window.innerWidth >= 1280) {
+        $(".secondary-container-js").hide();
+        $(".header-secondary").addClass("open");
+    }
+})
+
+$(".header-catalogue-item-js").on("mouseenter", (e) => {
+    const tab = $(e.currentTarget);
+    const currentSecondary = tab.closest("header").find(('[data-secondary-container-id="' + tab.data().categoryId + '"]'));
+
+    if (currentSecondary.filter(":animated").length > 0) {
+        return false;
+    }
+
+    $(".secondary-container-js").slideUp(250);
+    currentSecondary.slideDown(250);
+})
+
+
+// $(header).on("mouseleave", () => {
+//     $(".secondary-container-js").slideUp(250);
+// })
+
+
+// $(".header-catalogue-item-empty-js").on("mouseenter", () => {
+//     $(".secondary-container-js").slideUp(250);
+// })
+
+
+// оберег от ложных срабатываний модалок внутри ссылок в  хедере
+$(document).on("click", ".lk-modal-menu", (e) => {
+    e.preventDefault();
+});
+
+
+
+// клик по любому эелементу с классом .link-button-js = переход на data-relocate-link этого элемента
+
+$(document).on("click", ".link-button-js", (e) => {
+    e.preventDefault();
+    const link = $(e.currentTarget);
+    const data = link.data();
+    document.location.href = data.relocateLink;
+});
+
+
+// Проявление и исчезновение модалок хедера
+// const cartModal = $(".cart-header-modal-js");
+// const userModal = $(".header-user-modal");
+
+
+// const showModal = (modal) => {
+//     modal.addClass("active");
+// };
+
+// const hideModal = (modal) => {
+
+//     hideModalTimer = setTimeout(() => {
+//         modal.removeClass("active");
+//     }, 1000)
+// };
+
+
+// const headerModalShow = (modal) => {
+//     showModal(modal);
+//     hideModal(modal);
+// };
+
+
+// $(document).on("mouseover", ".cart-header-modal-js", (e) => {
+//     clearTimeout(hideModalTimer);
+// });
+// $(document).on("mouseover", ".header-user-modal", (e) => {
+//     clearTimeout(hideModalTimer);
+// });
+
+
+// $(document).on("mouseleave", ".cart-header-modal-js", (e) => {
+//     hideModal(userModal);
+//     hideModal(cartModal);
+// });
+// $(document).on("mouseleave", ".header-user-modal", (e) => {
+//     hideModal(userModal);
+//     hideModal(cartModal);
+// });
+
+// проявление модалки юзера в хедере
+
+$(document).on("mouseenter", ".lk-user-js", (e) => {
+    headerModalShow(userModal);
+});
+
+
+// вызов модалки корзины осузествляется этим методом
+// headerModalShow(cartModal);
+
+
+// маска на инпуты tel
+// для активации надо положить класс на обёртку самого инпута
+
+$(document).on("click", ".input-tel-mask", (e) => {
+    const input = $(e.currentTarget).find("input");
+    input.mask("+7(999) 999-9999");
+});
+
+
+// вызов burger-menu
+
+$(document).on("click", ".burger-button", (e) => {
+    $(".burger-button").toggleClass("burger-button_open");
+    $(".header").toggleClass("burger-menu_open");
+    $("html, body").toggleClass("scroll_lock");
+});
+
+
+
+// любая модалка
+const modalWindow = $(".modal-window");
+
+// модалка проверки статуса заказа
+const checkOrderStatus_modal = $(".check-order-status-modal-js");
+
+// модалка проверки статуса заказа выдача  - модалка заказа
+const orderStatus_modal = $(".modal_check-status-js")
+
+
+// модалка выбора города
+const chooseGeo_modal = $(".choose-geo-modal-js");
+
+// модалка входа
+const enterance_modal = $(".modal-window_enterance-js");
+
+// модалка введите код для входа 
+const enterCodeSignIn = $(".signIn-via-tel-js")
+
+// модалка регистрации
+const signUp_modal = $("#registration");
+
+// модалка введите код для регистрации
+const enterCodeRegistraton_modal = $(".signUp-via-tel-js");
+
+// модалка успешной регистрации 
+const successEmail_modal = $(".success-email-js");
+
+// модалка говорящая проверить почту для смены пароля
+const successRestore_modal = $(".success-restore-js");
+
+// модалка смены пароля
+const restorePassword_modal = $(".modal-window_restore-password");
+
+// модалка спасибо за подписку
+const successSubscribe_modal = $(".success-subscribe-js");
+
+// модалка в корзине  выбор подписки 
+
+const choiceService_modal = $(".modal_service-programs")
+
+// модалка в корзине описание - добавление мобильного управления
+const mobileControl_modal = $(".mobile-control-modal-js")
+
+const cloudConditioner_modal = $(".cloud-conditioner-modal");
+
+
+
+// вызов blackout , сопровождается блокировкой скролла 
+let scrollTopVar = 0;
+const blackout_on = () => {
+    $(".blackout").addClass("active");
+    scrollTopVar = $(document).scrollTop();
+    $("html, body").addClass("scroll_lock");
+};
+
+
+// выкл blackout, скролл вкл(если не открыт бурган)
+const blackout_off = () => {
+    $(".blackout").removeClass("active");
+
+    if (!$(".header").hasClass('burger-menu_open')) {
+        $("html, body").removeClass("scroll_lock");
+        $(document).scrollTop(scrollTopVar);
+
+    } else {
+        return;
+    }
+};
+
+
+// вызов любой общей (полноэкранной) модалки 
+const call_modal = (modalVar) => {
+    modalVar.addClass("active");
+    blackout_on();
+};
+
+// выход из конкретной модалки по нажатии modal-exit и кнопки ОК
+$(document).on("click", ".modal-exit,.button-ok,.modal-exit-js", (e) => {
+    const exitButton = $(e.currentTarget);
+    exitButton.closest(".modal-window").removeClass("active");
+
+
+    //  проверка что на странице больше нет открытых модалок(если есть, блэкаут останется)
+    if ($('.modal-window.active').length <= 0) {
+        return blackout_off();
+    }
+
+});
+
+// выход из всех модалок по клику на blackout
+$(document).on("click", ".blackout", (e) => {
+    modalWindow.removeClass("active");
+    blackout_off();
+})
+
+
+
+// вызов модалки выбора города
+$(document).on("click", ".city-modal-js", (e) => {
+    call_modal(chooseGeo_modal);
+    if(chooseGeo_modal.hasClass('active')){
+        chooseGeo_modal.find('#result_form').height(chooseGeo_modal.find('#result_form').outerHeight());
+    }
+});
+
+// вызов модалки проверки статуса заказа
+$(document).on("click", ".orders-modal-js", (e) => {
+    e.preventDefault();
+    const callBtn = $(e.currentTarget);
+
+
+    if (!(callBtn.hasClass('lk-nav__item_inactive') && callBtn.hasClass('disabled'))) {
+        call_modal(checkOrderStatus_modal);
+    } else {
+        return;
+    }
+
+});
+
+
+// вызов модалки самого заказа
+
+$(document).on("click", ".call-order-modal-js", () => {
+    call_modal(orderStatus_modal);
+})
+
+// вызов модалки АВТОРИЗАЦИИ 
+
+$(document).on("click", ".lk-nav__item_logIn-button,.login-link", (e) => {
+    e.preventDefault();
+    const callBtn = $(e.currentTarget);
+
+
+    if (!(callBtn.hasClass('lk-nav__item_inactive') && callBtn.hasClass('disabled'))) {
+        enterance_modal.modal('show');
+    } else {
+        return;
+    }
+});
+
+
+// вызов модалки РЕГИСТРАЦИИ 
+
+$(document).on("click", ".move-to-registration-js", (e) => {
+    e.preventDefault();
+    const currentButton = $(e.currentTarget);
+    currentButton.closest("#sign-in").modal('hide');
+    signUp_modal.modal('show');
+});
+
+// Вызов модалки АВТОРИЗАЦИИ ИЗ МОДАЛКИ РЕГИСТРАЦИИ 
+$(document).on("click", ".move-to-enterance-js", (e) => {
+    e.preventDefault();
+    const currentButton = $(e.currentTarget)
+    currentButton.closest(".modal").modal('hide');
+    enterance_modal.modal('show');
+});
+
+
+
+
+// таймер обратного отсчёта, встречаетя на модалках входа/регистрации через телефон
+// ДЛЯ СРАБОТКИ ТАЙМЕРА ВЫЗЫВАЕТСЯ МЕТОД "sendCode_countdown(seconds)";
+const enter_countdown = $('.code-sec-counter');
+var timer;
+// эта переменная определяет сколько секунд будет тикать таймер перед тем как разблокировать кнопку
+const seconds = 60;
+
+function sendCode_countdown() {
+    var startFrom = seconds;
+
+
+    timer = setInterval(function () {
+        $(".recive-code-again").addClass("disabled");
+        $(".code-disable-timer").removeClass("hidden");
+        enter_countdown.text(--startFrom);
+        if (startFrom <= 0) {
+            clearInterval(timer);
+            $(".code-disable-timer").addClass("hidden");
+            $(".recive-code-again").removeClass("disabled");
+        }
+    }, 1000);
+}
+
+sendCode_countdown(seconds);
+
+$(document).on("click", ".recive-code-again", (e) => {
+    sendCode_countdown(seconds);
+})
+
+
+
+
+
+
+
+
+// маска на инпут площади дома
+$(".tab-select-form input").mask("9?9999999999999", {
+    placeholder: ""
+});
+
+
+
+// слайдер на странице мои заказы
+
+// if (window.innerWidth < 768) {
+
+//     $('.orders-box').slick({
+//         dots: true,
+//         speed: 500,
+//         arrows: false,
+//         dotsClass: "orders-slider-dots",
+//     });
+
+// }
+
+// слайдер новостей
+// $('.news-box').slick({
+//     slidesToShow: 2,
+//     infinite: true,
+//     speed: 500,
+//     variableWidth: true,
+//     slidesToScroll: 1,
+//     arrows: true,
+//     nextArrow: ".news-next-btn",
+//     prevArrow: ".news-prev-btn",
+
+//     responsive: [{
+//             breakpoint: 768,
+//             settings: {
+//                 slidesToShow: 1,
+//                 slidesToScroll: 1,
+//                 arrows: false,
+//                 variableWidth: true,
+//             }
+//         },
+
+//     ],
+
+// });
+
+
+// // слайдер с баннерами на главной странице, первый блок
+
+// $('.banners-slider_desk').slick({
+//     dots: true,
+//     infinite: true,
+//     speed: 500,
+//     fade: true,
+//     cssEase: 'linear',
+//     arrows: false,
+//     dotsClass: "banners-slider-dots",
+//     autoplay: true,
+//     autoplaySpeed: 5000,
+
+
+// });
+
+// // маленький слайдер на деске
+
+// $('.small-banner-slider').slick({
+//     dots: true,
+//     infinite: true,
+//     speed: 500,
+//     fade: true,
+//     cssEase: 'linear',
+//     arrows: false,
+//     dotsClass: "banners-slider-dots",
+//     autoplay: true,
+//     autoplaySpeed: 5000,
+
+// });
+
+
+
+// if (window.innerWidth < 1275) {
+//     $('.banners-slider_tabMob').slick({
+//         dots: true,
+//         infinite: true,
+//         speed: 500,
+//         fade: true,
+//         cssEase: 'linear',
+//         arrows: false,
+//         dotsClass: "banners-slider-dots",
+//         autoplay: true,
+//         autoplaySpeed: 5000,
+
+//     });
+
+// }
+
+// // слайдер с товарами
+
+// $('.slider-buy-with-product').slick({
+//     dots: false,
+//     slidesToScroll: 1,
+//     arrows: true,
+//     slidesToShow: 4,
+//     variableWidth: true,
+//     responsive: [{
+//         breakpoint: 768,
+//         settings: {
+//             arrows: false,
+//         }
+//     }],
+// });
+
+// // слайдер карточек подписок  на главной
+
+// $('.sbr-promo-slider-js').slick({
+//     slidesToShow: 2,
+//     infinite: true,
+//     speed: 500,
+//     variableWidth: true,
+//     nextArrow: ".sbr-promo-next-btn",
+//     prevArrow: ".sbr-promo-prev-btn",
+// });
+
+
+
+// // слайдер акций
+
+// //
+// $('.promos__slider').slick({
+//     dots: true,
+//     infinite: true,
+//     speed: 500,
+//     fade: true,
+//     cssEase: 'linear',
+//     arrows: false,
+//     dotsClass: "banners-slider-dots",
+//     autoplay: true,
+//     autoplaySpeed: 5000,
+
+// });
+
+
+// Рома
+
+$(function () {
+    setWidth('.tag-row', 1280)
+    setWidth('.need-resize', 1280)
+    setWidth('.need-resize-sm', 768)
+    checkCatalogView()
+})
+
+$(window).on('resize', function () {
+    setWidth('.tag-row', 1280)
+    setWidth('.need-resize', 1280)
+    setWidth('.need-resize-sm', 768)
+    checkCatalogView()
+})
+
+$(document).on("click", '.catalog-switcher__elem', function (e) {
+    $('.catalog-switcher__elem_active').removeClass('catalog-switcher__elem_active')
+    $(this).addClass('catalog-switcher__elem_active')
+
+    if ($(this).hasClass('catalog-switcher__elem_table'))
+        $('.catalog-list').addClass('table')
+    else
+        $('.catalog-list').removeClass('table')
+})
+
+$(document).on("click", '.card-btns__btn', function (e) {
+    e.preventDefault()
+    $(this).toggleClass('added')
+})
+
+$(document).on("click", '.play', function (e) {
+    e.preventDefault()
+    const video = $(this).data('video');
+    const iframe = document.createElement('iframe')
+    iframe.src = `https://www.youtube.com/embed/${video}?autoplay=1`
+    $(iframe).attr('frameborder', '0')
+    $(iframe).attr('width', '560')
+    $(iframe).attr('height', '315')
+    $(iframe).attr('autoplay')
+    $(this).closest('.product-popup-slider__elem').append(iframe)
+    $(this).closest('.video-prev').remove()
+})
+
+$(document).on('mouseenter', '.tooltip', function () {
+    if (window.innerWidth < 768) {
+        window.openedTooltip = $(this);
+        window.tooltipContent = window.openedTooltip.find('.tooltip-info');
+
+        $('body, html').css('overflow', 'hidden')
+        $('body').append(window.tooltipContent.addClass('opened'));
+        window.tooltipContent.append('<div class="tooltip-rom-close"></div>')
+        window.tooltipContent.wrap('<div class="tooltip-content-wrapper-mobile"></div>')
+    }
+
+    $(this).find('.tooltip-info').addClass('opened')
+})
+
+$(document).on('mouseleave', '.tooltip', function () {
+    $(this).find('.tooltip-info').removeClass('opened')
+})
+
+$(document).on('mousedown', '.tooltip-content-wrapper-mobile', function (e) {
+    console.log(e.target);
+    if ($(e.target).hasClass('tooltip-rom-close') || $(e.target).hasClass('tooltip-content-wrapper-mobile')) {
+        $('body, html').css('overflow', 'auto')
+        window.tooltipContent.find('.tooltip-rom-close').remove();
+        $('.tooltip-content-wrapper-mobile').remove();
+        $('body').append(window.tooltipContent.removeClass('opened'));
+        window.openedTooltip.append(window.tooltipContent)
+    }
+})
+
+$(document).on('click', '.tab-list__elem', function () {
+    const tabName = $(this).data('tab')
+    const tabType = $(this).closest('.tab-list').data('tabtype')
+    const tabList = $(`#${tabType}`)
+
+    $('.tab-list__elem').removeClass('active')
+    $(this).addClass('active')
+
+    $(`.tab-content__elem`).removeClass('active')
+    tabList.find(`.tab-content__elem[data-tab="${tabName}"]`).addClass('active')
+})
+
+$(document).on('click', '.show-modal', function (e) {
+    e.preventDefault()
+    const scrollWidth = getScrollWidth();
+    $('body').css({
+        'overflow': 'hidden',
+        'paddingRight': scrollWidth + 'px',
+    })
+    $('.header').css({
+        'paddingRight': scrollWidth + 'px',
+    })
+    const modalId = $(this).data('modal')
+    $(`#${modalId}`).addClass('opened')
+})
+
+$(document).on('click', function (e) {
+    if ($(e.target).hasClass('popup-rom') || $(e.target).hasClass('popup-rom-close')) {
+        $('body').css({
+            'overflow': 'auto',
+            'paddingRight': 'unset',
+        })
+        $('.header').css({
+            'paddingRight': 'unset',
+        })
+        $(`.popup-rom`).removeClass('opened')
+    }
+})
+
+function setWidth(selector, sizeWindow) {
+    if ($(selector).length) {
+        if (window.innerWidth < sizeWindow) {
+            $(selector).width(`${$('body').width() - $(selector).offset().left}px`)
+        } else {
+            $(selector).width(`auto`)
+        }
+    }
+}
+
+function checkCatalogView() {
+    if ((window.innerWidth > 1279 &&
+            $('.catalog-switcher__elem_table').hasClass('catalog-switcher__elem_active')) ||
+        $('.catalog-switcher').length == 0
+    ) {
+        $('.catalog-list').addClass('table')
+    } else {
+        $('.catalog-list').removeClass('table')
+    }
+}
+
+
+
+// my profile - page
+
+// функция для полей, где предусмотрен вызов модалки
+
+$(document).on('click', '.edit-profile-data-modal-js', function (e) {
+    e.preventDefault()
+    const id = $(this).data('id');
+    call_modal($(`#${id}`));
+})
+// след шаг (только для модалки смены телеофна)
+$(document).on('click', '.js-next-step-phone', function (e) {
+    e.preventDefault()
+    const step1_modal = $(this).closest(".modal-window");
+    hideModal(step1_modal);
+
+    call_modal($(`#${$(this).data('id')}`));
+
+    $('#phone-sms').text(step1_modal.find('.profile-change-tel-input').val())
+});
+//  шаг назад (только для модалки смены телеофна)
+
+$(document).on('click', '.change-phone-modal-back-js', function (e) {
+    e.preventDefault()
+
+    $(this).closest('.modal-window').removeClass("active");
+    $(`#${$(this).data('id')}`).addClass("active");
+});
+
+
+$(document).on("click", ".change-adress-button-js", (e) => {
+
+    const button = $(e.currentTarget);
+
+
+    call_modal($(`#${button.data('id')}`))
+
+
+    const currentAdressItem = button.closest(".adress-item");
+    const form = $(".adress-change-popup");
+
+
+
+    const input = (inputname) => {
+        return form.find(`input[name=${inputname}]`);
+    }
+
+    const adressVal = currentAdressItem.find('div[data-adress-item-street').data().adressItemStreet;
+    const houseVal = currentAdressItem.find('[data-adress-item-house').data().adressItemHouse;
+    const cityVal = currentAdressItem.find('div[data-adress-item-city').data().adressItemCity;
+    const enteranceVal = currentAdressItem.find('div[data-adress-item-enterance').data().adressItemEnterance;
+    const apartVal = currentAdressItem.find('div[data-adress-item-apart').data().adressItemApart;
+    const intercomVal = currentAdressItem.find('div[data-adress-item-intercom').data().adressItemIntercom;
+    const levelVal = currentAdressItem.find('div[data-adress-item-level').data().adressItemlevel;
+
+
+    input("STREET").val(adressVal);
+    input("CITY").val(cityVal);
+    input("ENTERANCE").val(enteranceVal);
+    input("HOUSE").val(houseVal);
+    input("APARTMENTS").val(apartVal);
+    input("INTERCOM").val(intercomVal);
+    input("FLOOR").val(levelVal);
+
+    input("RECORD_ID").val(button.data("value"));
+})
+
+
+
+
+
+$(document).on('click', '.js-link_slide', function (e) {
+    e.preventDefault()
+    $(this).toggleClass('link_slide_active')
+    $(this).siblings('.additional-services-slide-down').slideToggle();
+})
+
+
+
+
+// dropdown-classic-mechanics
+
+$(document).on("click", ".dropdown-title", (e) => {
+    const box = $(e.currentTarget).siblings(".dropdown-box");
+    const bar = $(e.currentTarget).closest(".dropdown-bar");
+    if (box.filter(":animated").length > 0) {
+        return false;
+    }
+    bar.toggleClass("active");
+    box.slideToggle(300);
+})
+
+
+// type 2 
+
+
+$(document).on("click", ".dropdown-title", (e) => {
+
+    const bar = $(e.currentTarget).closest(".dropdown-item");
+    const box = bar.find(".dropdown-content");
+
+    if (box.filter(":animated").length > 0) {
+        return false;
+    }
+
+    box.slideToggle(300);
+
+    bar.toggleClass("open");
+
+})
+
+
+// подмена слова 
+$(window).on("load resize", (e) => {
+    const cutter = $(".cut-content-js");
+
+
+    if (window.innerWidth < 768) {
+
+        cutter.each(function () {
+            $(this).text($(this).data().cutContent)
+        })
+    }
+})
+
+function getScrollWidth() {
+    let div = document.createElement('div');
+
+    div.style.overflowY = 'scroll';
+    div.style.width = '50px';
+    div.style.height = '50px';
+
+    // мы должны вставить элемент в документ, иначе размеры будут равны 0
+    document.body.append(div);
+    return div.offsetWidth - div.clientWidth;
+}
+
+
+// выпадашка в модалке проверки статуса заказа
+
+$(document).on("click", ".goods-dropdown-title-js", (e) => {
+    $(e.currentTarget).toggleClass("open")
+    $(".check-order-goods-box-js").slideToggle(250);
+})
+
+
+
+// КОРЗИНА
+
+
+const promoFieldOpener = () => {
+    const promocodeCheckbox = $(".promocode-checkbox");
+    const promocodeCheckboxStatus = promocodeCheckbox.prop("checked");
+
+
+    const field = $('.promocode-field-container');
+
+    if (field.filter(":animated").length > 0) {
+        return false;
+    }
+
+
+    if (promocodeCheckboxStatus) {
+        field.slideDown(300)
+    } else {
+        field.slideUp(300);
+    }
+}
+promoFieldOpener();
+
+
+$(document).on('input', '.promocode-checkbox', (e) => {
+    promoFieldOpener();
+})
+
+$(document).on("click", ".set-promocode-js", (e) => {
+    const button = $(e.currentTarget);
+
+    $(".promocode-interactive-box").hide();
+    $(".promocode-input-checkbox-js").hide();
+    $(".promocode-sucsess-box").show();
+})
+
+
+if (window.innerWidth < 768) {
+
+    // $(".service-popup-container").slick({
+    //     slidesToShow: 1,
+    //     slidesToScroll: 1,
+    //     arrows: false,
+    //     dotsClass: "s-p-nav",
+    //     dots: true,
+    //     // variableWidth: true,
+    // })
+}
+
+
+// галочка добавить программу
+$(document).on("click", ".choice-service-program-js", (e) => {
+    e.preventDefault();
+    const unitData = $(e.currentTarget).attr("id");
+    call_modal(choiceService_modal)
+    choiceService_modal.attr("data-uniq-id", unitData)
+
+    let vendorId = $(e.currentTarget).attr("data-sp-reciver");
+
+    // обнуляем все кнопки в модалке при её вызове
+    $(".service-p-arrange-button").removeClass("off").removeClass("button_secondary").text("Добавить услугу");
+
+    // проверка на наличие нажатой кнопки(закрашенной галочки,) если она такая,то выбранная опция будет подкрашена
+
+    choiceService_modal.find(`[data-sp-id="${vendorId}"]`).addClass("off").removeClass('on').addClass("button_secondary").text("Удалить услугу");
+
+})
+
+// добавить услугу
+$(document).on("click", ".service-p-arrange-button.on", (e) => {
+    const button = $(e.currentTarget);
+    const reciverID = button.closest(".modal-window").attr("data-uniq-id");
+    const currentCheckbox = $(`[id="${reciverID}"]`);
+
+    // сброс кнопок перед выбором новых
+    $(".service-p-arrange-button").removeClass("off");
+    $(".service-p-arrange-button").addClass("on");
+    $(".service-p-arrange-button").removeClass("button_secondary");
+    $(".service-p-arrange-button").text("Добавить услугу");
+
+    // сброс id товара У ЧЕКБОКСА перед выбором нового
+    currentCheckbox.attr("data-sp-reciver", "");
+
+    // перекрашиваем кнопку
+    button.addClass("button_secondary");
+    button.addClass("off");
+    button.removeClass("on");
+    button.text("Удалить услугу");
+
+    // ставим галочку и вешаем новый id товара на ЧЕКБОКС
+    currentCheckbox.find("input").attr("checked", "checked");
+    const span = currentCheckbox.find("span.c-checkbox__text");
+    span.text(button.data("sp-text") + ' ');
+    span.append('<span class="c-checkbox__text_gray"></span>');
+    currentCheckbox.find("span.c-checkbox__text_gray").text(button.data("sp-price"));
+    currentCheckbox.attr("data-sp-reciver", button.data("sp-id"))
+
+    const id = currentCheckbox.attr('data-value');
+    const name = currentCheckbox.attr('data-sp-reciver');
+    sendAjaxFormField(id, name, '/local/lib/ajax/cart/ajax.php');
+})
+
+function sendAjaxFormField(id, name, url) {
+    $.ajax({
+        url: url, //url страницы (action_ajax_form.php)
+        type: "POST", //метод отправки
+        dataType: "html", //формат данных
+        data: {
+            'id': id,
+            'name': name,
+        },
+        success: function (response) { //Данные отправлены успешно
+            return 'success';
+        },
+        error: function (response) { // Данные не отправлены
+            return 'error';
+        }
+    });
+}
+
+
+
+// удалить услугу
+$(document).on("click", ".service-p-arrange-button.off", (e) => {
+    const button = $(e.currentTarget);
+    const reciverID = button.closest(".modal-window").attr("data-uniq-id");
+    const currentCheckbox = $(`[id="${reciverID}"]`);
+    const name = currentCheckbox.attr('data-sp-reciver');
+
+    button.removeClass("button_secondary").removeClass("off").addClass('on').text("Добавить услугу");
+
+    // сброс id товара У ЧЕКБОКСА перед выбором нового
+    currentCheckbox.attr("data-sp-reciver", "");
+    currentCheckbox.find("input").removeAttr("checked");
+
+    const id = currentCheckbox.attr('data-value');
+    sendAjaxFormField(id, name, '/local/lib/ajax/cart/ajaxCancel.php');
+})
+
+
+
+
+
+
+
+
+
+// галочка добавить мобильный контроль
+$(document).on("click", ".mobile-control-call-modal-js", (e) => {
+    e.preventDefault();
+    call_modal(mobileControl_modal);
+    const unitData = $(e.currentTarget).attr("id");
+    mobileControl_modal.attr("data-uniq-id", unitData)
+    let vendorId = $(e.currentTarget).attr("data-sp-reciver");
+
+
+    // обнуляем все кнопки в модалке при её вызове
+    mobileControl_modal.find(".button").removeClass("button_secondary").removeClass("delete-service-js").addClass("add-service-js").text("Добавить услугу")
+
+
+    // проверка на наличие нажатой кнопки(закрашенной галочки,) если она такая,то выбранная опция будет подкрашена
+    mobileControl_modal.find(`[data-sp-id="${vendorId}"]`).addClass("button_secondary").addClass("delete-service-js").removeClass("add-service-js").text("Удалить услугу");
+
+
+
+})
+
+// кнопка выбора мобильного контроля
+$(document).on("click", ".add-service-js", (e) => {
+    const button = $(e.currentTarget);
+    const reciverID = button.closest(".modal-window").attr("data-uniq-id");
+    const currentCheckbox = $(`[id="${reciverID}"]`);
+
+
+    button.addClass("button_secondary").addClass("delete-service-js").text("Удалить услугу").removeClass("add-service-js");
+
+    // сброс id товара У ЧЕКБОКСА перед выбором нового
+    currentCheckbox.attr("data-sp-reciver", "");
+
+
+
+    // ставим галочку и вешаем новый id товара на ЧЕКБОКС
+    currentCheckbox.find("input").attr("checked", "checked");
+    currentCheckbox.attr("data-sp-reciver", button.data("sp-id"))
+
+    const id = currentCheckbox.attr('data-value');
+    const name = currentCheckbox.attr('data-sp-reciver');
+    sendAjaxFormField(id, name, '/local/lib/ajax/cart/ajax.php');
+})
+
+// кнопка удалить мобильный контроль
+$(document).on("click", ".delete-service-js", (e) => {
+    const button = $(e.currentTarget);
+    const reciverID = button.closest(".modal-window").attr("data-uniq-id");
+    const currentCheckbox = $(`[id="${reciverID}"]`);
+    const name = currentCheckbox.attr('data-sp-reciver');
+    currentCheckbox.attr("data-sp-reciver", "");
+    currentCheckbox.find("input").removeAttr("checked");
+
+    button.addClass("add-service-js").removeClass("button_secondary").text("Добавить услугу").removeClass("delete-service-js")
+
+    const id = currentCheckbox.attr('data-value');
+    sendAjaxFormField(id, name, '/local/lib/ajax/cart/ajaxCancel.php');
+});
+
+
+
+
+// облачная модалка облачный кондиционер
+
+$(document).on("click", ".call-cloud-modal-js", () => {
+    call_modal(cloudConditioner_modal);
+});
+
+
+
+
+// copy-requisites-js
+
+$(document).on("click", ".copy-requisites-js", (e) => {
+    const buffer = $(".text-buffer")
+    const $tmp = $("<textarea>");
+    $("body").append($tmp);
+    $tmp.val($(buffer).text()).select();
+    document.execCommand("copy");
+    $tmp.remove();
+})
+
+
+
+// открытие выпадающего select-menu
+
+$(document).on("click", ".select ", function (e) {
+    e.stopPropagation();
+    $(".select__dropdown").slideUp(250);
+    const currentSelect = $(this);
+
+    currentSelect.toggleClass("open-select-js");
+
+    if (!currentSelect.hasClass("open-select-js")) {
+        $(this).find('.select__dropdown').slideUp(250);
+    } else {
+        $(this).find('.select__dropdown').slideToggle(250);
+    }
+
+});
+
+
+// выбор варианта
+
+$(document).on("click", ".select__item", function (e) {
+    e.stopPropagation();
+    const transmitter = $(e.currentTarget);
+    const transmitterData = transmitter.data().selectTransmitterVal;
+    const reciver = transmitter.closest(".select").find(".select-reciver");
+    reciver.val(transmitterData);
+
+    const val = $(this).text().trim();
+    $(this).closest(".select").removeClass("open-select-js");
+    $(this).closest('.select').find('.select__trigger').text(val);
+    $(this).closest('.select__dropdown').slideUp(250);
+
+});
+
+
+// закрытие любого селекта по клику вне селекта
+
+$(document).on("click", () => {
+    $(".select").removeClass("open-select-js");
+    $(".select__dropdown").slideUp(250);
+})
+
+
+
+$(".mobile-search-js").on("click", (e) => {
+    e.preventDefault();
+    $("html, body").addClass("scroll_lock");
+    $(".header-search-bar").addClass("mobile-search-active");
+})
+
+
+$(".search__close-button").on("click", () => {
+    $("html, body").removeClass("scroll_lock");
+    $(".header-search-bar").removeClass("mobile-search-active");
+})
+
+
+
+
+// Кнопка лифта 
+
+const $scrollUpButton = $(".scrollUp-button")
+$(window).on("scroll", () => {
+
+
+    if ($(this).scrollTop() > 500) {
+        $scrollUpButton.addClass("active")
+    } else {
+        $scrollUpButton.removeClass("active")
+    }
+
+
+})
+
+$scrollUpButton.on('click', () => {
+    $('html, body').stop().animate({
+        scrollTop: 0
+    }, 300);
+});
+
+
+// фильтр каталога - индикатор примененных фильтров
+
+const filterTrigger = $(".filter-trigger-js")
+let setFiltersCounter = 0;
+const $setFiltersCounterBox = $(".set-filters-indicator")
+
+const getSetFilters = () => {
+    setFiltersCounter = 0;
+
+    filterTrigger.each(function () {
+        const $element = $(this);
+        const type = $element.attr("type");
+
+        const textExists = type === "text" && $element.val() !== "";
+        const checkboxChecked = type === "checkbox" && $element.prop('checked');
+
+        if (textExists || checkboxChecked) {
+            setFiltersCounter++
+        }
+    })
+
+    if (setFiltersCounter > 0) {
+        $setFiltersCounterBox.show();
+        return $setFiltersCounterBox.text(setFiltersCounter)
+    } else {
+        return $setFiltersCounterBox.hide();
+    }
+
+}
+$(document).on("input", ".filter-trigger-js", () => {
+    console.log("listener works");
+    getSetFilters();
+})
+// filterTrigger.on("input", getSetFilters)
+
+
+
+// каталог выпадашки
+// const closeAllFaqBars = () => {
+//     const bar = $('.catalog-faq__dropdown-bar');
+//     bar.removeClass('open');
+//     bar.find('.content').slideUp(200);
+
+$(document).ready(function (){
+    closeAllFaqBars();
+});
+
+// $('.catalog-faq__dropdown-bar').on('click', (e) => {
+//     closeAllFaqBars();
+//     const bar = $(e.currentTarget);
+//     const dropdown = bar.find('.content');
+
+//     if (dropdown.filter(":animated").length > 0) {
+//         return false
+//     }
+
+//     bar.addClass('open');
+
+//     dropdown.slideDown(200);
+
+$(document).on('click', '.search-wide-prompts .search-prompt', function(){
+    let _this = $(this);
+    let data = _this.data();
+    $.ajax({
+        url: '/local/lib/ajax/header/citySelector.php',
+        type: "GET", //метод отправки
+        // dataType: "json", //формат данных
+        data: {
+            'city': data.city
+        },
+        success: function (response) { //Данные отправлены успешно
+            window.location = data.back;
+        },
+        error: function (response) { // Данные не отправлены
+            return 'error';
+        }
+    });
+    return false;
+});
+
+//  поиск города в модальном окне
+$(document).on('input', '.choose-geo-modal-js #subscribes_search', function(){
+    let _this = $(this);
+    let text = _this.val();
+    let cities = _this.closest('.modal-form').find('#result_form a');
+    cities.each(function(i, elm){
+        let _elm = $(elm);
+        let city = _elm.text().toLowerCase();
+        if(city.indexOf(text.toLowerCase()) == 0 && city != ''){
+            _elm.css('display', 'block');
+        }
+        else{
+            _elm.css('display', 'none');
+        }
+    });
+});
+$(document).on('click', '.choose-geo-modal-js .search-clear', function(){
+    let _this = $(this);
+    let cities = _this.closest('.modal-form').find('#result_form a');
+    _this.closest('.search-field-wrp').find('#subscribes_search').val('');
+    cities.css('display', 'block');
+    // cities.each(function(i, elm){
+    //         _elm.css('display', 'block');
+    //     }
+    //     else{
+    //         _elm.css('display', 'none');
+    //     }
+    // });
+});

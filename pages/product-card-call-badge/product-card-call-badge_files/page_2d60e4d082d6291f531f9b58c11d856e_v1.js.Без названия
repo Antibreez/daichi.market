@@ -1,0 +1,15 @@
+
+; /* Start:"a:4:{s:4:"full";s:85:"/local/templates/main/components/bitrix/catalog.element/main/script.js?16896595421926";s:6:"source";s:70:"/local/templates/main/components/bitrix/catalog.element/main/script.js";s:3:"min";s:0:"";s:3:"map";s:0:"";}"*/
+function wrapProductInfoListOnMobile(){const o=$(".product-info-list");window.innerWidth<768&&0!==o.length?o.each((function(){const o=$(this).find(".product-info-list__elem"),i=$(o[4]).nextAll();o.length>5&&0===$(this).find(".product-info-list_wrapper").length&&(i.wrapAll('<ul class="product-info-list_wrapper"></ul>'),$(".product-info-list_wrapper").after('<div class="product-info-list__show-more">Показать все</div>'))})):o.each((function(){const o=$(this).find(".product-info-list__elem");o.length>5&&0!==$(this).find(".product-info-list_wrapper").length&&(o.closest(".product-info-list_wrapper").next(".product-info-list__show-more").remove(),o.unwrap(".product-info-list_wrapper"))}))}$((function(){$(".product-slider-min").slick({variableWidth:!0,focusOnSelect:!0,infinite:!0,slidesToShow:4,slidesToScroll:1,asNavFor:".product-slider",arrows:!0}),$(".product-popup-slider").slick({infinite:!0,slidesToShow:1,slidesToScroll:1,asNavFor:".product-popup-slider-min",arrows:!1}),$(".product-popup-slider-min").slick({variableWidth:!0,focusOnSelect:!0,infinite:!0,slidesToShow:7,slidesToScroll:1,asNavFor:".product-popup-slider",arrows:!0}),wrapProductInfoListOnMobile()})),$(window).on("resize",(function(){wrapProductInfoListOnMobile()})),$(document).on("click",".product-popup",(function(o){($(o.target).hasClass("product-popup")||$(o.target).hasClass("close-product-popup"))&&($(".product-popup").removeClass("opened"),$("body, html").css("overflow","auto"))})),$(document).on("click",".product-slider-min .product-slider-min__elem_video, .product-slider__elem",(function(o){$(".product-popup").addClass("opened"),$("body, html").css("overflow","hidden")})),$(document).on("click",".product-info-list__show-more",(function(o){const i=$(this);$(this).prev(".product-info-list_wrapper").slideToggle(300,(function(){"Скрыть"===i.text().trim()?i.text("Показать все"):i.text("Скрыть")}))}));
+/* End */
+;
+; /* Start:"a:4:{s:4:"full";s:98:"/local/templates/main/components/usstudio/form.result.new/notify.admission/script.js?1689659543224";s:6:"source";s:84:"/local/templates/main/components/usstudio/form.result.new/notify.admission/script.js";s:3:"min";s:0:"";s:3:"map";s:0:"";}"*/
+$(function () {
+    $(document).on('click', '.js-add-id-to-modal', function () {
+        $('input[name="form_hidden_39"]').val($(this).data().name)
+        $('input[name="form_hidden_43"]').val($(this).data().name)
+    })
+})
+/* End */
+;; /* /local/templates/main/components/bitrix/catalog.element/main/script.js?16896595421926*/
+; /* /local/templates/main/components/usstudio/form.result.new/notify.admission/script.js?1689659543224*/

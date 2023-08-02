@@ -118,6 +118,15 @@
 				</g>
 			</g>
 		</symbol>
+    <symbol id="phone-call" viewBox="0 0 24 24" fill="none">
+      <g id="Group">
+      <g id="Group_2">
+      <path id="Path" fill-rule="evenodd" clip-rule="evenodd" d="M10.131 14.369C8.961 13.199 8.079 11.889 7.493 10.56C7.37 10.279 7.442 9.94997 7.659 9.73297L8.478 8.91397C9.149 8.24297 9.149 7.29397 8.563 6.70797L7.39 5.53497C6.609 4.75397 5.343 4.75397 4.562 5.53497L3.91 6.18597C3.169 6.92697 2.86 7.99597 3.06 9.05597C3.554 11.669 5.072 14.53 7.521 16.979C9.97 19.428 12.831 20.946 15.444 21.44C16.504 21.64 17.573 21.331 18.314 20.59L18.965 19.939C19.746 19.158 19.746 17.892 18.965 17.111L17.792 15.938C17.206 15.352 16.256 15.352 15.671 15.938L14.768 16.842C14.551 17.059 14.222 17.132 13.941 17.008C12.612 16.421 11.301 15.538 10.131 14.369Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path id="Path_2" d="M21 9.5V3.5H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path id="Path_3" d="M15 9.5L21 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      </g>
+    </symbol>
 		<symbol id="grid" viewBox="0 0 20 20">
 			<g fill-rule="evenodd">
 				<g>

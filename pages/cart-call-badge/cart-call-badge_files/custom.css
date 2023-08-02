@@ -1,0 +1,9 @@
+a > small,
+a > small > small
+{
+	opacity: 1 !important;
+}
+
+.tab-content__elem .document-list .document-item {
+	position: relative;
+}
